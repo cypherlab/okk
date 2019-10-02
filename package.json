@@ -10,7 +10,6 @@
     "readme": "yarn run okk script okk-readme",
     "link": "yarn global add file:$PWD",
     "unlink": "yarn global remove @cypherlab/okk",
-    "prepare": "yarn run readme",
     "release": "np --no-tests --no-release-draft"
   },
   "bin": {
