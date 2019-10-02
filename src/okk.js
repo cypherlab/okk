@@ -51,7 +51,7 @@ import PkgsManager from './pkgs'
   okk.dry = dry
   okk.cfg = (k) => k ? resolvePath.get(okkcfg, k) : okkcfg
 
-  if(!okk.cmds.includes(okk.cmd)) okk.cmd = 'dsl' //thro(`404 command, use [${okk.cmds.join(',')}]`)
+  if(!okk.cmds.includes(okk.cmd)) okk.cmd = 'help' //thro(`404 command, use [${okk.cmds.join(',')}]`)
 
 
   // INIT PkgsManager

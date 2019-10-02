@@ -6,15 +6,17 @@ const PkgsManager = function(okk, options) {
       logRuns: true
     , ...options
   }
+
+  this.okk = okk
 }
 
 PkgsManager.prototype.exists = function(pkg) {
-  const path = `${okk.cfg('dirs.pkgs')}/${pkg}`
+  const path = `${this.okk.cfg('dirs.pkgs')}/${pkg}`
   return exists(path)
 }
 
 PkgsManager.prototype.pkgPath = function(pkg) {
-  return exists(`${okk.cfg('dirs.pkgs')}/${pkg}`)
+  return exists(`${this.okk.cfg('dirs.pkgs')}/${pkg}`)
 }
 
 PkgsManager.prototype.run = async function(pkg, cmd, options) {

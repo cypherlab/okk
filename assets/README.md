@@ -32,6 +32,16 @@ yarn global add @cypherlab/okk
 okk init // create/update .okkrc file
 ```
 
+### pkgs
+
+Manage you multi repo packages.
+
+```
+okk pkgs
+okk pkgs ls
+okk pkgs add [repo]
+```
+
 ### script
 
 Run a custom script

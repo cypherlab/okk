@@ -1,5 +1,4 @@
-export { default as clone } from "./clone.js"
-export { default as dsl } from "./dsl.js"
+export { default as help } from "./help.js"
 export { default as init } from "./init.js"
 export { default as pkgs } from "./pkgs.js"
 export { default as readme } from "./readme.js"

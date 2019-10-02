@@ -69,7 +69,12 @@ export const dirNames = (dir) => {
   return names
 }
 
-// fileNames('./parent') => ["foo.js", "bar.js"]
+
+// #############
+// return clean file names array of specified dir or files
+// > fileNames('./parent') => ["foo.js", "bar.txt", ".baz"]
+// > fileNames('./parent', false) => ["foo.js", "bar.txt"]
+// > fileNames('./parent/*.js') => ["foo.js"]
 export const fileNames = (dir, showHidden=true) => {
   const names = shell.exec(`ls -ap ${dir}`, {silent:true})
 
@@ -91,7 +96,7 @@ export const fileNames = (dir, showHidden=true) => {
     })
 }
 
-
+// #############
 // filesPaths('/lib/*/package.json') => ["/lib/foo/package.json", "/lib/bar/package.json"]
 export const filesPaths = (dir) => {
   const paths = shell
@@ -103,6 +108,43 @@ export const filesPaths = (dir) => {
   return paths
 }
 
+// #############
+// Copy source file to destination
+// Third args is used either as an object, for handlebar templates
+// or as a function, for json transforms
+export const copyFile = (source, dest, subs = {}) => {
+  if(typeof subs == 'function'){ // we want json parse
+    write(dest, subs(read(source, 'json')), 'json')
+  }else{
+    write(dest, handlebars(read(source), subs))
+  }
+}
+
+// #############
+// Define a copy flow, and copy files by their names and not their paths
+//
+// Exemple: 
+// > const bake = copyFlow('./src', './dst')
+// > bake('foo.txt') // copy file 'src/foo.txt' to './dst/foo.txt'
+//
+// Second argument is either an 
+//   - object, for handlebars template subs
+//   - function, for json transform
+//
+// ex: interpolate data with handlebar {{sub}} 
+// > bake('README.md', { sub1: 'foo', sub2: 'bar' })
+//
+// 2) copy json file and change some params
+// > bake('package.json', pkg => {
+//     pkg.name = 'foo'
+//     pkg.description = 'bar'
+//     return pkg
+//   })
+export const copyFlow = (source, dest) => {
+  return (file, subs = {}) => copyFile(`${source}/${file}`, `${dest}/${file}`, subs)
+}
+
+// #############
 // loadFiles(["/lib/foo/package.json", "/lib/bar/package.json"], "json") => [{}, {}]
 // loadFiles("/lib/*/package.json", "json") => [{}, {}]
 export const loadFiles = (paths, json) => {
@@ -126,15 +168,35 @@ export const write = (file, data, json) => {
   return fs.writeFileSync(file, data, 'utf-8')
 }
 
-// parseName('@babel/node') => { name: '@babel/node', ns1: 'babel', ns2: 'node' }
-export const parseName = (name) => {
+// #############
+// parseLibName('@babel/node') => { name: '@babel/node', ns1: 'babel', ns2: 'node' }
+// parseLibName('foobar', 'larafale') => { name: 'foobar', ns1: 'larafa', ns2: 'node' }
+export const parseLibName = (name, user) => {
   const p = { name, ns1: name, ns2: name }
-  const s = name.split('/')
+  let s
 
-  if(s.length == 2){
-    p.ns1 = s[0].replace('@', '')
-    p.ns2 = s[1]
+  if(/github.com:/.test(p.name)){
+    s = name.split(':')[1].replace('.git', '')
+    p.ns1 = s.split('/')[0]
+    p.ns2 = s.split('/')[1]
+    p.name = p.ns2
+  }else if(/^github.com\//.test(p.name)){
+    s = name.split('github.com/')[1].replace('.git', '')
+    p.ns1 = s.split('/')[0]
+    p.ns2 = s.split('/')[1]
+    p.name = p.ns2
+  }else{
+    s = name.split('/')
+    if(s.length == 2){
+      p.ns1 = s[0].replace('@', '')
+      p.ns2 = s[1]
+    }else{
+      p.ns1 = user || false
+    }
   }
+
+  p.github = `https://github.com/${p.ns1}/${p.ns2}`
+  p.repo = `${p.github}.git`
 
   return p
 }

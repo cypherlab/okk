@@ -1,4 +1,7 @@
 {
+  "git": {
+    "user": "cypherlab"
+  },
   "dirs": {
     "scripts": "./scripts"
   },

@@ -15,7 +15,7 @@ export default async ({ okk }) => {
   if(!script.name || script.name == 'ls'){
     return scriptNames.length
       ? log('scripts list', scriptNames)
-      : log('no scripts yet ! create one with')
+      : log('no scripts yet ! create new script with: \n> okk script script-name --create')
   }
 
   script.filename = `${script.name}${/\.js/.test(script.name) ? '':'.js'}` // append .js to filename
