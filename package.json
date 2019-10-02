@@ -1,0 +1,32 @@
+{
+  "name": "@cypherlab/okk",
+  "version": "0.0.1",
+  "description": "🤖 Enhanced workflows for lazy programmers",
+  "author": "Louis Grellet <as1cron@gmail.com>",
+  "repository": "https://github.com/cypherlab/okk",
+  "license": "ISC",
+  "scripts": {
+    "okk": "node ./src",
+    "readme": "yarn run okk script okk-readme",
+    "link": "yarn global add file:$PWD",
+    "unlink": "yarn global remove @cypherlab/okk",
+    "prepare": "yarn run readme",
+    "release": "np"
+  },
+  "bin": {
+    "okk": "./src/cli.js"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "del": "^5.1.0",
+    "esm": "^3.2.25",
+    "execa": "^2.0.4",
+    "handlebars": "^4.2.0",
+    "lodash": "^4.17.15",
+    "meow": "^5.0.0",
+    "object-path": "^0.11.4",
+    "shelljs": "^0.8.3"
+  }
+}
