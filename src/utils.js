@@ -70,14 +70,25 @@ export const dirNames = (dir) => {
 }
 
 // fileNames('./parent') => ["foo.js", "bar.js"]
-export const fileNames = (dir) => {
-  const names = shell
-    .exec(`ls -p ${dir} | grep -v /`, {silent:true})
-    .stdout
+export const fileNames = (dir, showHidden=true) => {
+  const names = shell.exec(`ls -ap ${dir}`, {silent:true})
+
+  // command did not match anything
+  if(names.stderr) return []
+
+  return names.stdout
     .replace(/\n$/, "") // remove last line break
     .split('\n')
-
-  return names
+    .filter(n => {
+      if(n[n.length-1] == '/') return false
+      if(!showHidden && n[0]=='.') return false
+      return true
+    })
+    .map(n => {
+      n = n.split('/')
+      n = n[n.length - 1]
+      return n
+    })
 }
 
 

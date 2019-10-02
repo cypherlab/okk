@@ -46,12 +46,11 @@ A script must exports a default async function:
 
 ```js
 export default async ({ utils, okk }) => {
-
   // pull some utils fonctions
   const { pwdImport, shell } = utils
 
   // import some random file from your current project folder
-  const users = pwdImport('./data/users.js')
+  const { default: users } = await pwdImport('./assets/users.js')  
 
   // echo data
   shell.echo(users.join(''))

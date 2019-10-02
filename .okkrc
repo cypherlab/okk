@@ -1,4 +1,7 @@
 {
+  "dirs": {
+    "scripts": "./scripts"
+  },
   "pkgs": [
     "bar",
     "foo"
