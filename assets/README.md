@@ -2,19 +2,19 @@
 
 
 <p align="center">
+  <img width="250" alt="screenshot" src="https://user-images.githubusercontent.com/503577/66052337-c05caa00-e530-11e9-8e43-1d242ae7aa39.png">
+</p>
+<p align="center">
   🤖 Enhanced workflows for lazy programmers
 </p>
-<!--- NPM badges
 <p align="center">
-  <img width="300" alt="screenshot" src="https://user-images.githubusercontent.com/503577/65078746-f2510680-d99d-11e9-991b-b6aed436aec2.png">
-</p>
-<p align="center">
-  <a href="https://www.npmjs.com/package/@cypherlab/okk">
-    <img alt="npm" src="https://img.shields.io/npm/v/@cypherlab/okk">
+  <a href="https://www.npmjs.com/package/{{project.name}}">
+    <img alt="npm version" src="https://img.shields.io/npm/v/@cypherlab/okk">
   </a>
-  <img alt="NPM badge" src="https://img.shields.io/npm/l/@cypherlab/okk">
+  <img alt="lisence" src="https://img.shields.io/npm/l/@cypherlab/okk">
 </p>
--->
+
+---
 
 Whatever project you're working on, `okk` gives you access (via the command line) to a set of tools and commands that you can use to optimize your development workflows and manage your projects.
 
@@ -39,7 +39,6 @@ Run a custom script
 ```bash
 okk script // show all script
 okk script foo // run ./scripts/foo.js
-okk script foo.js // run ./scripts/foo.js
 ```
 
 A script must exports a default async function:
