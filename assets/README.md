@@ -34,7 +34,7 @@ okk init // create/update .okkrc file
 
 ### pkgs
 
-Manage you multi repo packages.
+Manage mono repo packages.
 
 ```
 okk pkgs

@@ -34,13 +34,15 @@ export const pwdImport = async (path) => {
   return m
 }
 
-export const exists = path => {
-  const exist = fs.existsSync(path)
+// mode : https://github.com/shelljs/shelljs#testexpression
+// -e mode is: true if path exists
+export const exists = (path, mode='-e') => {
+  const exist = shell.test(mode, path)
   return exist ? path : false
 }
 
 export const mkdir = dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+  shell.exec(`mkdir -p ${dir}`, {silent:true})
   return dir
 }
 
@@ -165,7 +167,9 @@ export const read = (file, json) => {
 
 export const write = (file, data, json) => {
   data = json ? JSON.stringify(data, null, 2) : data
-  return fs.writeFileSync(file, data, 'utf-8')
+  shell.ShellString(data).to(file)
+  // fs.writeFileSync(file, data, { encoding: 'utf-8', flag: 'w' })
+  return 
 }
 
 // #############

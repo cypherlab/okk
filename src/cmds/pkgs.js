@@ -1,9 +1,9 @@
 import { write, read, exists, exec, shell, dirNames, parseLibName } from '../utils'
 import { log } from '../shared'
 
-export default async ({ okk, pkger }) => {
+export default async ({ okk, pkger, dirs }) => {
   const cmd = okk.input[0]
-  const pkgsNames = dirNames(okk.cfg('dirs.pkgs'))
+  const pkgsNames = dirNames(dirs.pkgs)
 
   if(!cmd){
     log(`# pkgs commands :`)
@@ -35,7 +35,7 @@ export default async ({ okk, pkger }) => {
     // if pkg already exist return
     if(pkger.exists(pkgName)) thro(`pkg "${pkg.ns2}" already exists !`)
 
-    const cmd = `git clone ${pkg.repo} ${okk.cfg('dirs.pkgs')}/${pkgName}`
+    const cmd = `git clone ${pkg.repo} ${dirs.pkgs}/${pkgName}`
 
     // we redirect stderr to stdout 2>&1 for git clone, because git clone always return stderr.
     if(okk.flags.ack) await pkger.run(`${cmd} 2>&1`)

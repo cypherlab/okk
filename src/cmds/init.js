@@ -1,7 +1,7 @@
 import { write, read, exists, dirNames } from '../utils'
 import { log } from '../shared'
 
-export default ({ okk }) => {
+export default ({ okk, dirs }) => {
   const rcfile = okk.flags.name || okk.cfg('rcfile') || `.okkrc`
   const okkrc = exists(rcfile) ? read(rcfile, 'json') : {}
 

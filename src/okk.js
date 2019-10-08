@@ -1,6 +1,6 @@
 import meow from 'meow'
 import _ from 'lodash'
-import { thro, read, exists, exec, filesPaths, resolvePath } from './utils'
+import { shell, thro, read, exists, exec, filesPaths, resolvePath, getPwd } from './utils'
 import { log } from './shared'
 import * as allCommands from './cmds'
 import PkgsManager from './pkgs'
@@ -31,16 +31,29 @@ import PkgsManager from './pkgs'
   const dry = !flags.ack ? true : false
 
   const rcfile = flags.rc || '.okkrc'
-  const okkrc = exists(rcfile) ? read(rcfile, 'json') : {}
+
+  let okkrc 
+  try { okkrc = exists(rcfile) ? read(rcfile, 'json') : {} }
+  catch(e){ return log(`.okkrc file json syntax error`) }
+
   const okkcfg = _.merge({
       rcfile
     , dirs: {
-          pkgs: './pkgs'
+          global: '~/.okk'
+        , pkgs: './pkgs'
         , assets: './assets'
         , scripts: './scripts'
       }
     , pkgs: []
   }, okkrc)
+
+  // replace relative path with absolute
+  if(/^~/.test(okkcfg.dirs.global)){
+    okkcfg.dirs.global = okkcfg.dirs.global.replace(/^~/, shell.env.HOME)
+  }
+
+  // add pwd dir to dirs
+  okkcfg.dirs.pwd = getPwd()
 
   // PREPARE okk
   const okk = {}
@@ -61,6 +74,7 @@ import PkgsManager from './pkgs'
   // RUN FN
   const run = cmd => allCommands[cmd]({ 
       okk
+    , dirs: okkcfg.dirs
     , pkger
   })
 
