@@ -3,67 +3,76 @@ import { log } from '../shared'
 
 const { thro, exists, fileNames, read, write, handlebars } = utils
 
+// my-script becomes my:script
+const getNames = (dir) => fileNames(dir, false).map(getScriptName)
+const getScriptName = (n='') => n.replace('.js', '').replace(/-/g, ':')
+const getScriptFile = (n='') => n.replace('.js', '').replace(/:/g, '-') + '.js'
+
+
 export default async ({ okk, dirs }) => {
 
-  const script = { name: okk.input[0] }
-  const gFlag = okk.flags.g || okk.flags.global
+  const createFlag = okk.flags.create || okk.flags.c
+  const globalFlag = okk.flags.global || okk.flags.g
 
-  // if no script provided, default to ls
-  if(!script.name || script.name == 'ls'){
-    const lookup = gFlag 
-      ? `${dirs.global}/scripts/*.js`
-      : `${dirs.pwd}/${dirs.script}/*.js`
+  const script = {}
+  script.name = getScriptName(okk.input[0]) 
+  script.file = getScriptFile(script.name)
 
-    const scriptNames = fileNames(lookup, false).map(s => s.replace('.js', ''))
-
-    return scriptNames.length
-      ? log(`${gFlag?'global ':''}scripts list`, scriptNames)
-      : log('no scripts yet ! create new script with: \n> okk script script-name --create')
+  const paths = {
+      local: `${dirs.pwd}/${dirs.scripts}`
+    , global: `${dirs.global}/scripts`
   }
 
-  script.filename = `${script.name}${/\.js/.test(script.name) ? '':'.js'}` // append .js to filename
-  script.path = gFlag 
-    ? `${dirs.global}/scripts/${script.filename}`
-    : `${dirs.pwd}/${dirs.scripts}/${script.filename}`
+  const scripts = {
+      local: getNames(`${paths.local}/*.js`)
+    , global: getNames(`${paths.global}/*.js`)
+    , all: {}
+    , total: 0
+  };
 
-  // script does not exist locally
-  if(!exists(script.path)){
+  ['local', 'global'].map(scope => {
+    scripts[scope].map(s => { scripts.all[s] = `${paths[scope]}/${getScriptFile(s)}` })
+  })
 
-    // try global
-    script.global = `${dirs.global}/scripts/${script.filename}`
-
-    if(!exists(script.global)){
-
-      // auto create with --create
-      if(okk.flags.create){
-        // get & make script dir
-        const scriptsDir = okk.flags.global ? script.global : dirs.scripts
-        utils.mkdir(scriptsDir)
-        
-        const SCRIPT = handlebars(read(`${__dirname}/../tpls/new-script.js`), { script: script.name })
-        write(`${scriptsDir}/${script.name}.js`, SCRIPT)
-        log(`+ ${script.name}.js`)
-        log(`new script "${script.name}" created in ${scriptsDir}`)
-        return
-      }else{
-        log(`script "${script.name}" not found. create new script with:`)
-        log(`> "okk script ${script.name} --create" or "okk script ${script.name} --create --global"`)
-        return
-      }
-    }else{
-      script.path = script.global
-      script.global = true
+  scripts.total = Object.keys(scripts.all).length
+  
+  // if no script exists, or script not found, or script is ls
+  if(!Object.keys(scripts.all).includes(script.name)){
+    if(!script.name || script.name == 'ls'){
+      log('available scripts :')
+      log('> local', scripts.local)
+      log('> global', scripts.global)
+      return
     }
-  } 
+
+    if(createFlag){
+      const createDir = paths[globalFlag ? 'global' : 'local']
+      utils.mkdir(createDir)
+      const SCRIPT = handlebars(read(`${__dirname}/../tpls/new-script.js`), { script: script.name })
+      write(`${createDir}/${script.file}`, SCRIPT)
+      log(`+ ${script.file}`)
+      log(`new script "${script.name}" created in ${createDir}`)
+    }else{
+      log(`Hey, script "${script.name}" does not exist ! create one :`)
+      log(`>  local:  oks ${script.name} --create`)
+      log(`> global:  oks ${script.name} --create --global`)
+    }
+    return 
+  }
+
 
   try {
-    const raw = true || okk.flags.raw
+    const verb = okk.flags.v || okk.flags.verbose
+    
+    script.path = `${scripts.all[script.name]}` 
     script.fn = (await import(script.path)).default
-    !raw && log(`> running script "${script.name}" ${script.global?'from global':''}`)
-    !raw && log(`> --------------------------------------------------`)
+    script.ns = scripts.global.includes(script.name) ? 'global' : 'local'
+    
+    verb && log(`> running ${script.ns} script "${script.name}"`)
+    verb && log(`> --------------------------------------------------`)
     const exit = await script.fn({ utils, okk, dirs })
-    !raw && log(`> --------------------------------------------------`)
-    !raw && log(`> script exit ${exit==0?0:1}`)
+    verb && log(`> --------------------------------------------------`)
+    verb && log(`> script exit ${exit==0?0:1}`)
   }catch(e){
     log(`> script error`, e, e.message)    
   }

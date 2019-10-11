@@ -7,13 +7,15 @@
   "license": "ISC",
   "scripts": {
     "okk": "node ./src",
+    "oks": "OKK_CMD_ALIAS=script node ./src",
     "readme": "yarn run okk script okk-readme",
     "link": "yarn global add file:$PWD",
     "unlink": "yarn global remove @cypherlab/okk",
     "release": "np --no-tests --no-release-draft"
   },
   "bin": {
-    "okk": "./src/cli.js"
+    "okk": "./src/cli-okk.js",
+    "oks": "./src/cli-oks.js"
   },
   "files": [
     "src"

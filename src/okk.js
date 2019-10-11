@@ -17,7 +17,7 @@ import PkgsManager from './pkgs'
       --clean,        delete kit files
 
     Examples
-      $ okk clone some-repo
+      $ okk script heroku:log
   `, {
     flags: {
         ack: { type: 'boolean' }
@@ -25,10 +25,16 @@ import PkgsManager from './pkgs'
     }
   })
 
+
   // ARGS
-  const input = cli.input
+  let input = cli.input
   const flags = cli.flags
   const dry = !flags.ack ? true : false
+
+  // overide first arg with cmd alias (used for okk script => oks)
+  if(process.env.OKK_CMD_ALIAS){
+    input = [ process.env.OKK_CMD_ALIAS, ...input ]
+  }
 
   const rcfile = flags.rc || '.okkrc'
 
